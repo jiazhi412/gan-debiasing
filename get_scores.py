@@ -18,7 +18,7 @@ if __name__=="__main__":
              'num_workers': 1}
     
     loader = create_dataset_nolabel(
-        'data/fake_images/AllGenImages/',
+        '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/AllGenImages/',
         (0, 175000),
         params,
         CelebaDataset)

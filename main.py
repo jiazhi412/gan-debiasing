@@ -84,6 +84,16 @@ def main(opt):
             CelebaDataset)
 
     if opt['experiment'] in ['model', 'model_inv', 'fake_only']:
+        # val = create_dataset_actual(
+        #     opt['data_setting']['path'],
+        #     opt['data_setting']['attribute'],
+        #     opt['data_setting']['protected_attribute'],
+        #     opt['data_setting']['params_real_val'],
+        #     False,
+        #     CelebaDataset,
+        #     split='valid')
+        # val_weight = None
+
         val = create_dataset_actual(
             opt['data_setting']['real_params']['path'],
             opt['data_setting']['real_params']['attribute'],

@@ -12,10 +12,12 @@ if __name__=="__main__":
     
     opt = parse_args.collect_args_linear()
     np.random.seed(opt['random_seed'])
+
+    print(opt)
     
     X = pickle.load(open('record/GAN_model/latent_vectors.pkl', 'rb')) 
-    g = pickle.load(open('data/fake_images/all_'+opt['prot_attr_name']+'_scores.pkl', 'rb')) 
-    a = pickle.load(open('data/fake_images/all_'+opt['attr_name']+'_scores.pkl', 'rb'))
+    g = pickle.load(open('/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/all_'+opt['prot_attr_name']+'_scores.pkl', 'rb')) 
+    a = pickle.load(open('/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/all_'+opt['attr_name']+'_scores.pkl', 'rb'))
 
     X_train = X[:10000, :]
     g_train = g[:10000]

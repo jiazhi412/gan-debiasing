@@ -17,15 +17,15 @@ def collect_args_main():
                                 ])
     
     parser.add_argument('--experiment_name', type=str, default='_')
-    parser.add_argument('--real_data_dir', type=str, default='data/celeba')
-    parser.add_argument('--fake_data_dir_orig', type=str, default='data/fake_images/AllGenImages/')
+    parser.add_argument('--real_data_dir', type=str, default='/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/')
+    parser.add_argument('--fake_data_dir_orig', type=str, default='/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/AllGenImages/')
     parser.add_argument('--fake_data_dir_new', type=str, default='_')
     parser.add_argument('--fake_scores_target', type=str, default='_')
     parser.add_argument('--fake_scores_protected', type=str, default='_')
     parser.add_argument('--no_cuda', dest='cuda', action='store_false')
     parser.add_argument('--random_seed', type=int, default=0)
-    parser.add_argument('--attribute', type=int, default=31)
-    parser.add_argument('--protected_attribute', type=int, default=20)
+    parser.add_argument('--attribute', type=int, default=20) # 31 represent smiling
+    parser.add_argument('--protected_attribute', type=int, default=20) # 20 represents male
     parser.add_argument('--test_mode', type=bool, default=False)
     parser.add_argument('--num_train', type=int, default=160000)
     parser.add_argument('--number', type=int, default=0)
@@ -97,9 +97,9 @@ def create_experiment_setting(opt):
         
         if opt['fake_data_dir_new']=='_':
             if opt['protected_attribute']!=20:
-                input_path_new = 'data/fake_images/protected'+attr_list[opt['protected_attribute']]+'/'+attr_name+'/'
+                input_path_new = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/protected'+attr_list[opt['protected_attribute']]+'/'+attr_name+'/'
             else:
-                input_path_new = 'data/fake_images/{}/'.format(attr_name)
+                input_path_new = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/{}/'.format(attr_name)
         else:
             input_path_new = opt['fake_data_dir_new']
 
@@ -107,11 +107,11 @@ def create_experiment_setting(opt):
         input_path_orig = opt['fake_data_dir_orig']
         #scores = 'data/fake_images/' + attr_name+'_scores.pkl'
         if opt['fake_scores_target']=='_':
-            scores = 'data/fake_images/{}_scores.pkl'.format(attr_name)
+            scores = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/{}_scores.pkl'.format(attr_name)
         else:
             scores = opt['fake_scores_target']
         if opt['fake_scores_protected']=='_':
-            domain = 'data/fake_images/all_' + attr_list[opt['protected_attribute']]+'_scores.pkl'
+            domain = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/all_' + attr_list[opt['protected_attribute']]+'_scores.pkl'
         else:
             domain = opt['fake_scores_protected']
         params_train = {'batch_size': 32,
@@ -175,7 +175,7 @@ def collect_args_generate():
     opt['dtype'] = torch.float32
     
     if opt['experiment']=='pair' and opt['save_dir']=='_':
-        opt['save_dir']='data/fake_images/{}/'.format(opt['attr_name'])
+        opt['save_dir']='/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/{}/'.format(opt['attr_name'])
     if opt['experiment']=='pair' and opt['latent_file']=='_':
         opt['latent_file']='record/GAN_model/latent_vectors_{}.pkl'.format(opt['attr_name'])
     return opt
@@ -183,7 +183,7 @@ def collect_args_generate():
 
 def collect_args_scores():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--attribute', type=int, default=31)
+    parser.add_argument('--attribute', type=int, default=20) # 31 represent smiling
     parser.add_argument('--model_dir', type=str, default='record/baseline')
     parser.add_argument('--out_file', type=str, default='_')
     parser.add_argument('--random_seed', type=int, default=0)
@@ -200,7 +200,7 @@ def collect_args_scores():
         opt['device'] = torch.device('cpu')
     opt['dtype'] = torch.float32
     if opt['out_file']=='_':
-        opt['out_file']='data/fake_images/all_{}_scores.pkl'.format(opt['attr_name'])
+        opt['out_file']='/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/all_{}_scores.pkl'.format(opt['attr_name'])
 
     return opt
 
@@ -233,7 +233,7 @@ def collect_args_full_skew():
     parser = argparse.ArgumentParser()
     parser.add_argument('--attribute1', type=int, default=31)
     parser.add_argument('--attribute2', type=int, default=20)
-    parser.add_argument('--real_data_dir', type=str, default='data/celeba')
+    parser.add_argument('--real_data_dir', type=str, default='/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/')
     parser.add_argument('--random_seed', type=int, default=0)
     parser.add_argument('--test_mode', type=bool, default=False)
     parser.add_argument('--opp', type=bool, default=False)

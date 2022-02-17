@@ -23,8 +23,8 @@ def generate_orig_images(model, num_images):
     with open('record/GAN_model/latent_vectors.pkl', 'wb+') as f:
         pickle.dump(noise.detach().cpu().numpy(), f)
     
-    out_dir = 'data/fake_images/AllGenImages/'
-    utils.make_dir('data/fake_images')
+    out_dir = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/AllGenImages/'
+    utils.make_dir('/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/')
     utils.make_dir(out_dir)
 
     batch_size=64
