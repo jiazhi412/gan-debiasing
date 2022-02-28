@@ -107,7 +107,7 @@ def create_experiment_setting(opt):
         input_path_orig = opt['fake_data_dir_orig']
         #scores = 'data/fake_images/' + attr_name+'_scores.pkl'
         if opt['fake_scores_target']=='_':
-            scores = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/{}_scores.pkl'.format(attr_name)
+            scores = '/nas/home/jiazli/datasets/CelebA/cropped_data_for_gan_debiasing/fake_images/all_{}_scores.pkl'.format(attr_name)
         else:
             scores = opt['fake_scores_target']
         if opt['fake_scores_protected']=='_':

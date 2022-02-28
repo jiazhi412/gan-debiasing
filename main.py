@@ -133,58 +133,75 @@ def main(opt):
             AC.save_model(save_path_curr)
 
     AC = attribute_classifier(opt['device'], opt['dtype'], modelpath=save_path)
-    val_targets, val_scores = AC.get_scores(val)
-    test_targets, test_scores = AC.get_scores(test)
+    val_targets, val_scores, _ = AC.get_scores(val)
+    test_targets, test_scores, test_features = AC.get_scores(test)
 
-    with open(opt['save_folder']+'/val_scores.pkl', 'wb+') as handle:
-        pickle.dump(val_scores,handle)
-    with open(opt['save_folder']+'/val_targets.pkl', 'wb+') as handle:
-        pickle.dump(val_targets,handle)
-    with open(opt['save_folder']+'/test_scores.pkl', 'wb+') as handle:
-        pickle.dump(test_scores,handle)
-    with open(opt['save_folder']+'/test_targets.pkl', 'wb+') as handle:
-        pickle.dump(test_targets,handle)
+    # with open(opt['save_folder']+'/val_scores.pkl', 'wb+') as handle:
+    #     pickle.dump(val_scores,handle)
+    # with open(opt['save_folder']+'/val_targets.pkl', 'wb+') as handle:
+    #     pickle.dump(val_targets,handle)
+    # with open(opt['save_folder']+'/test_scores.pkl', 'wb+') as handle:
+    #     pickle.dump(test_scores,handle)
+    # with open(opt['save_folder']+'/test_targets.pkl', 'wb+') as handle:
+    #     pickle.dump(test_targets,handle)
 
     cal_thresh = utils.calibrated_threshold(val_targets[:, 0], val_scores)
     f1_score,f1_thresh = utils.get_threshold(val_targets[:, 0], val_scores)
-    val_pred=np.where(val_scores>cal_thresh, 1, 0)
+    # val_pred=np.where(val_scores>cal_thresh, 1, 0)
     test_pred=np.where(test_scores>cal_thresh, 1, 0)
 
-    ap, ap_std = utils.bootstrap_ap(val_targets[:, 0], val_scores)
-    deo, deo_std = utils.bootstrap_deo(val_targets[:, 1], val_targets[:, 0], val_pred)
-    ba, ba_std = utils.bootstrap_bias_amp(val_targets[:, 1], val_targets[:, 0], val_pred)
-    kl, kl_std = utils.bootstrap_kl(val_targets[:, 1], val_targets[:, 0], val_scores)
+    # ap, ap_std = utils.bootstrap_ap(val_targets[:, 0], val_scores)
+    # deo, deo_std = utils.bootstrap_deo(val_targets[:, 1], val_targets[:, 0], val_pred)
+    # ba, ba_std = utils.bootstrap_bias_amp(val_targets[:, 1], val_targets[:, 0], val_pred)
+    # kl, kl_std = utils.bootstrap_kl(val_targets[:, 1], val_targets[:, 0], val_scores)
 
-    val_results = {
-        'AP':ap, 'AP_std': ap_std,
-        'DEO':deo, 'DEO_std':deo_std,
-        'BA':ba, 'BA_std': ba_std,
-        'KL':kl, 'KL_std':kl_std,
-        'f1_thresh': f1_thresh,
-        'cal_thresh': cal_thresh,
-        'opt': opt
-    }
+    # val_results = {
+    #     'AP':ap, 'AP_std': ap_std,
+    #     'DEO':deo, 'DEO_std':deo_std,
+    #     'BA':ba, 'BA_std': ba_std,
+    #     'KL':kl, 'KL_std':kl_std,
+    #     'f1_thresh': f1_thresh,
+    #     'cal_thresh': cal_thresh,
+    #     'opt': opt
+    # }
     
-    print('Validation results: ')
-    print('AP : {:.1f} +- {:.1f}', 100*ap, 200*ap_std)
-    print('DEO : {:.1f} +- {:.1f}', 100*deo, 200*deo_std)
-    print('BA : {:.1f} +- {:.1f}', 100*ba, 200*ba_std)
-    print('KL : {:.1f} +- {:.1f}', kl, 2*kl)
+    # print('Validation results: ')
+    # print('AP : {:.1f} +- {:.1f}', 100*ap, 200*ap_std)
+    # print('DEO : {:.1f} +- {:.1f}', 100*deo, 200*deo_std)
+    # print('BA : {:.1f} +- {:.1f}', 100*ba, 200*ba_std)
+    # print('KL : {:.1f} +- {:.1f}', kl, 2*kl)
 
-    with open(opt['save_folder']+'/val_results.pkl', 'wb+') as handle:
-        pickle.dump(val_results,handle)
+    # with open(opt['save_folder']+'/val_results.pkl', 'wb+') as handle:
+    #     pickle.dump(val_results,handle)
 
+
+##############################################################
+    # test start here
+    # print('\n')
+    # print(test_targets.shape)
+    # print(test_scores.shape)
+    # print(test_pred.shape)
+
+    # print(test_targets)
+    # print(test_scores)
+    # print(test_pred)
 
     ap, ap_std = utils.bootstrap_ap(test_targets[:, 0], test_scores)
     deo, deo_std = utils.bootstrap_deo(test_targets[:, 1], test_targets[:, 0], test_pred)
     ba, ba_std = utils.bootstrap_bias_amp(test_targets[:, 1], test_targets[:, 0], test_pred)
     kl, kl_std = utils.bootstrap_kl(test_targets[:, 1], test_targets[:, 0], test_scores)
+    
+    
+    gender_targets = torch.tensor(test_targets[:,-1].reshape((-1,1)))
+    dcor = utils.Distance_Correlation(test_features, gender_targets)
+    mi, entropy, RLB = utils.Representation_Level_Bias(test_features, gender_targets, opt)
 
     test_results = {
         'AP':ap, 'AP_std': ap_std,
         'DEO':deo, 'DEO_std':deo_std,
         'BA':ba, 'BA_std': ba_std,
         'KL':kl, 'KL_std':kl_std,
+        'dcor': dcor, 'RLB': RLB,
         'f1_thresh': f1_thresh,
         'cal_thresh': cal_thresh,
         'opt': opt
@@ -204,3 +221,5 @@ if __name__=="__main__":
     opt = parse_args.collect_args_main()
 
     main(opt)
+
+

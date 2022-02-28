@@ -78,20 +78,22 @@ class attribute_classifier():
         acc = 0.0
         y_all = []
         scores_all = []
+        feature_list = []
         with torch.no_grad():
             for (x, y) in loader:
                 x = x.to(device=self.device, dtype=self.dtype)  # move to device, e.g. GPU
                 y = y.to(device=self.device, dtype=torch.long)
                 
-                scores, _ = self.model(x)
+                scores, features = self.model(x)
                 scores = torch.sigmoid(scores).squeeze()
                 
                 y_all.append(y.detach().cpu().numpy())
                 scores_all.append(scores.detach().cpu().numpy())
+                feature_list.append(features)
             y_all = np.concatenate(y_all)
             pred_all = np.concatenate(scores_all)
         
-        return y_all, pred_all
+        return y_all, pred_all, torch.cat(feature_list)
 
 
         

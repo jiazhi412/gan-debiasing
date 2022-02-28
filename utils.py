@@ -5,6 +5,71 @@ import numpy as np
 from sklearn.metrics import average_precision_score, f1_score, recall_score
 from os import listdir, path, mkdir
 from scipy.ndimage import gaussian_filter
+import matplotlib.pyplot as plt
+import dcor
+import time
+import RLB_utils as RLB
+import os
+
+
+def Distance_Correlation(r, z):
+    # time_start=time.time()
+    res = dcor.distance_correlation(r.cpu(), z.cpu())
+    # print("Distance correlation: {}".format(res))
+    # time_end=time.time()
+    # print('time cost',time_end-time_start,'s')
+    return res
+
+def Representation_Level_Bias(r,z,opt):
+    r = r.float().to(opt['device'])
+    z = z.float().to(opt['device'])
+    RLB_opt ={'iter_num': 30000,
+              'window_size': 1000,
+              'ma_et': 1.0,
+              'encoder_dim': 10,
+            #   'batch_size': 1000,
+              'batch_size': 1,
+              'hidden_dim': 1000,
+              'learning_rate': 1e-4,
+              'converge_criterion': False,
+              'stop_error': 1e-3,
+              'stop_region': 3000,
+              'device': opt['device'],
+              'experiment': 'CelebA',
+              'save_model': False,
+              'save_path': opt['save_folder']}
+    data = (r,z)
+    model = RLB.RLB(r.shape[1], z.shape[1], RLB_opt)
+    optim = torch.optim.Adam(model.parameters(), lr=RLB_opt['learning_rate'])
+    mi, entropy, bias = RLB.train(data, model, optim, **RLB_opt)
+    result = (mi, entropy, bias)
+    return RLB_result(RLB_opt, result)
+
+def RLB_result(opt, result):
+    mi, entropy, bias = result
+    mi_ma, entropy_ma, bias_ma = RLB.ma(mi, opt['window_size']), RLB.ma(entropy, opt['window_size']), RLB.ma(bias, opt['window_size'])
+    result_last = { "Max" : bias_ma.max(), 
+                    "Min" : bias_ma.min(),
+                    "Mean" : bias_ma.mean(),
+                    "Last mi" : mi_ma[-1], 
+                    "Last entropy" : entropy_ma[-1], 
+                    "Last bias" : bias_ma[-1]}
+    print(result_last)
+
+    # save figure
+    # plt.plot(range(mi_ma.shape[0]), mi_ma)
+    # plt.savefig(os.path.join(opt['save_path'], "mi.png"))
+    # plt.show()
+
+    # plt.plot(range(entropy_ma.shape[0]), entropy_ma)
+    # plt.savefig(os.path.join(opt['save_path'], "entropy.png"))
+    # plt.show()
+
+    plt.plot(range(bias_ma.shape[0]), bias_ma)
+    plt.savefig(os.path.join(opt['save_path'], "bias.png"))
+    # plt.show()
+    return mi_ma[-1], entropy_ma[-1], bias_ma[-1]
+
 
 
 def compute_weight(domain, target):
