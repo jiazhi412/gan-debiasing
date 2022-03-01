@@ -6,7 +6,7 @@ import torch.optim as optim
 import numpy as np
 from Models.attr_classifier import attribute_classifier
 from load_data import * 
-import argparse
+import parse_args
 import utils
 import pickle
 from sklearn.metrics import average_precision_score
@@ -71,7 +71,7 @@ def main(opt):
             CelebaDataset,
             split='valid')
 
-        val_targets, val_scores = AC.get_scores(val)
+        val_targets, val_scores, _ = AC.get_scores(val)
 
         with open(opt['save_folder']+'/val_scores_{}.pkl'.format(attr), 'wb+') as handle:
             pickle.dump(val_scores,handle)

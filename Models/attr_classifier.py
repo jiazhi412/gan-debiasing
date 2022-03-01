@@ -63,7 +63,7 @@ class attribute_classifier():
         self.epoch += 1
 
     def check_avg_precision(self, loader, weights=None, print_out=True):
-        y_all, pred_all = self.get_scores(loader)
+        y_all, pred_all, _ = self.get_scores(loader)
         acc = average_precision_score(y_all[:, 0], pred_all, sample_weight=weights)
         
         if print_out:

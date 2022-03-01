@@ -27,7 +27,7 @@ if __name__=="__main__":
     AC = attribute_classifier(opt['device'], opt['dtype'], modelpath='{}/{}/best.pth'.format(opt['model_dir'], opt['attr_name']))
      
     print('Computing scores using {}/{} classifier'.format(opt['model_dir'], opt['attr_name']))
-    _, scores = AC.get_scores(loader, False)
+    _, scores, _ = AC.get_scores(loader, False)
 
     threshold = pickle.load(open(opt['model_dir']+'/'+opt['attr_name']+'/test_results.pkl', 'rb'))['f1_thresh']
     scores = np.where(scores>threshold, 1.0, 0.0)
