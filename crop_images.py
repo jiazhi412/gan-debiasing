@@ -4,7 +4,7 @@ from PIL import Image
 import os
 
 
-def crop_images(inputPath, outputPath, size=128):
+def crop_images(inputPath, outputPath, size=256):
     img_list = [f for f in os.listdir(inputPath) if os.path.splitext(f)[1]==".jpg"]
 
     nImgs = len(img_list)
@@ -33,6 +33,3 @@ def crop_images(inputPath, outputPath, size=128):
 if __name__=="__main__":
     # crop_images("data/celeba/img_align_celeba/", "data/celeba/img_align_celeba/")
     crop_images("/nas/home/jiazli/datasets/CelebA/img_align_celeba/", "/nas/home/jiazli/datasets/CelebA/img_align_celeba/")
-
-
-
